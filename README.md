@@ -1,5 +1,13 @@
 # 🎯 Assignment Optimization System
 
+## 👥 Group Members
+
+| No. | Name | Matric Number |
+| 1 | MUHAMMAD SYABIL ASNA BIN MOHAMAD RASOOL | 2240216 |
+| 2 | NUR AMIRAH MIRZA BINTI IBRAHIM | 2240217 |
+| 3 | KWEE ZHENG YU | 2240218 |
+| 4 | NUR HIDAYATI BINTI KAMARUDIN | 2240219 |
+
 ## 📌 Overview
 Assignment Optimization System is a web-based system developed to help students determine the best combination of easy and hard assignments to complete using Linear Programming.
 
