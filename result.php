@@ -1,0 +1,261 @@
+<?php
+$u = $_POST['u'];
+$n = $_POST['n'];
+$z = $_POST['z'];
+$steps = explode('|', $_POST['steps']);
+
+$easy_available = $_POST['easy_available'];
+$hard_available = $_POST['hard_available'];
+
+$max_assignments = $_POST['max_assignments'];
+$easy_time = $_POST['easy_time'];
+$hard_time = $_POST['hard_time'];
+$total_time = $_POST['total_time'];
+
+$c1x1 = $_POST['c1x1'];
+$c1x2 = $_POST['c1x2'];
+$c1b  = $_POST['c1b'];
+
+$c2x1 = $_POST['c2x1'];
+$c2x2 = $_POST['c2x2'];
+$c2b  = $_POST['c2b'];
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Optimization Result | LP System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+<?php include 'navbar.php'; ?>
+
+<div class="container my-5">
+
+    <div class="row g-4 equal-height-row">
+
+        <!-- LEFT SIDE: OPTIMAL SOLUTION + LOGS -->
+        <div class="col-md-4">
+            <div class="left-result-column">
+
+                <div class="glass text-center result-card-compact mb-4">
+                    <h2 class="mb-4">Optimal Solution</h2>
+
+                    <div class="mb-2 text-secondary result-subtext">
+                        Easy Assignments Selected (x₁):
+                        <span class="text-white fw-bold"><?php echo $u; ?></span>
+                    </div>
+
+                    <div class="mb-4 text-secondary result-subtext">
+                        Hard Assignments Selected (x₂):
+                        <span class="text-white fw-bold"><?php echo $n; ?></span>
+                    </div>
+
+                    <div class="highlight-score small-score"><?php echo $z; ?></div>
+
+                    <p class="text-info mt-2 mb-0" style="font-weight: 600; letter-spacing: 1px;">
+                        MAXIMUM TOTAL ASSIGNMENTS
+                    </p>
+                </div>
+
+                <div class="glass logs-card">
+                    <h3 class="mb-4">Optimization Logs</h3>
+
+                    <div class="p-3 logs-box" style="background: rgba(0,0,0,0.3); border-radius: 15px;">
+                        <ul class="list-unstyled mb-0" style="font-family: 'Courier New', monospace; font-size: 0.85rem; color: #a855f7;">
+                            <?php
+                            foreach ($steps as $s) {
+                                echo "<li class='mb-2'>→ " . htmlspecialchars($s) . "</li>";
+                            }
+                            ?>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- RIGHT SIDE: MATHEMATICAL MODEL -->
+        <div class="col-md-8">
+            <div class="glass model-card">
+                <h3 class="mb-4" style="color: var(--primary-glow);">
+                    Mathematical Model
+                </h3>
+
+                <div class="model-box">
+
+                    <div class="p-3 mb-3" style="background: rgba(255,255,255,0.05); border-radius: 15px;">
+                        <span class="text-secondary">Decision Variables:</span><br>
+                        x₁ = Number of easy assignments selected<br>
+                        x₂ = Number of hard assignments selected
+                    </div>
+
+                    <div class="p-3 mb-3" style="background: rgba(255,255,255,0.05); border-radius: 15px;">
+                        <span class="text-secondary">Assignment Availability:</span><br>
+                        Easy Assignments Available = <?php echo $easy_available; ?><br>
+                        Hard Assignments Available = <?php echo $hard_available; ?>
+                    </div>
+
+                    <div class="p-3 mb-3" style="background: rgba(255,255,255,0.05); border-radius: 15px;">
+                        <span class="text-secondary">User Input Constraints:</span><br>
+                        Maximum Assignments Can Be Completed = <?php echo $max_assignments; ?><br>
+                        Time for 1 Easy Assignment = <?php echo $easy_time; ?><br>
+                        Time for 1 Hard Assignment = <?php echo $hard_time; ?><br>
+                        Total Time Available = <?php echo $total_time; ?>
+                    </div>
+
+                    <div class="p-3 mb-3" style="background: rgba(255,255,255,0.05); border-radius: 15px;">
+                        <span class="text-secondary">Objective Function:</span><br>
+                        <strong>Maximize Z = x₁ + x₂</strong><br>
+                        <small class="small-text">
+                            The objective is to maximize the total number of assignments completed.
+                        </small>
+                    </div>
+
+                    <div class="p-3" style="background: rgba(255,255,255,0.05); border-radius: 15px;">
+                        <span class="text-secondary">LP Constraints Generated by System:</span><br>
+                        1. <?php echo $c1x1; ?>x₁ + <?php echo $c1x2; ?>x₂ ≤ <?php echo $c1b; ?><br>
+                        2. <?php echo $c2x1; ?>x₁ + <?php echo $c2x2; ?>x₂ ≤ <?php echo $c2b; ?><br>
+                        3. x₁ ≤ <?php echo $easy_available; ?><br>
+                        4. x₂ ≤ <?php echo $hard_available; ?><br>
+                        <span class="small-text">x₁, x₂ ≥ 0</span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- GRAPH FULL WIDTH -->
+        <div class="col-12">
+            <div class="glass">
+                <h3 class="mb-4" style="color: var(--primary-glow);">
+                    Feasible Region Analysis
+                </h3>
+
+                <div class="chart-container" style="position: relative; height:500px; width: 100%;">
+                    <canvas id="lpChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+Chart.defaults.color = '#e2e8f0';
+Chart.defaults.font.family = "'Inter', sans-serif";
+Chart.defaults.font.size = 14;
+
+const c1x1 = <?php echo $c1x1; ?>;
+const c1x2 = <?php echo $c1x2; ?>;
+const c1b  = <?php echo $c1b; ?>;
+
+const c2x1 = <?php echo $c2x1; ?>;
+const c2x2 = <?php echo $c2x2; ?>;
+const c2b  = <?php echo $c2b; ?>;
+
+const easyAvailable = <?php echo $easy_available; ?>;
+const hardAvailable = <?php echo $hard_available; ?>;
+
+const c1_y = c1x2 !== 0 ? c1b / c1x2 : hardAvailable;
+const c1_x = c1x1 !== 0 ? c1b / c1x1 : easyAvailable;
+
+const c2_y = c2x2 !== 0 ? c2b / c2x2 : hardAvailable;
+const c2_x = c2x1 !== 0 ? c2b / c2x1 : easyAvailable;
+
+const ctx = document.getElementById('lpChart').getContext('2d');
+
+new Chart(ctx, {
+    type: 'scatter',
+    data: {
+        datasets: [
+            {
+                label: 'Assignment Limit',
+                data: [
+                    {x: 0, y: c1_y},
+                    {x: c1_x, y: 0}
+                ],
+                borderColor: '#3b82f6',
+                borderWidth: 4,
+                showLine: true,
+                pointRadius: 0
+            },
+            {
+                label: 'Time / Effort Limit',
+                data: [
+                    {x: 0, y: c2_y},
+                    {x: c2_x, y: 0}
+                ],
+                borderColor: '#f59e0b',
+                borderWidth: 4,
+                showLine: true,
+                pointRadius: 0
+            },
+            {
+                label: 'Optimal Solution',
+                data: [
+                    {x: <?php echo $u; ?>, y: <?php echo $n; ?>}
+                ],
+                backgroundColor: '#ff0055',
+                pointRadius: 12,
+                pointHoverRadius: 15,
+                borderWidth: 3,
+                borderColor: '#ffffff'
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+
+        scales: {
+            x: {
+                min: 0,
+                max: Math.max(c1_x, c2_x, easyAvailable) + 1,
+                title: {
+                    display: true,
+                    text: 'Number of Easy Assignments (x₁)',
+                    font: {
+                        weight: 'bold'
+                    }
+                },
+                grid: {
+                    color: 'rgba(255, 255, 255, 0.1)'
+                }
+            },
+
+            y: {
+                min: 0,
+                max: Math.max(c1_y, c2_y, hardAvailable) + 1,
+                title: {
+                    display: true,
+                    text: 'Number of Hard Assignments (x₂)',
+                    font: {
+                        weight: 'bold'
+                    }
+                },
+                grid: {
+                    color: 'rgba(255, 255, 255, 0.1)'
+                }
+            }
+        },
+
+        plugins: {
+            legend: {
+                position: 'top',
+                labels: {
+                    boxWidth: 20,
+                    padding: 20
+                }
+            }
+        }
+    }
+});
+</script>
+
+</body>
+</html>
