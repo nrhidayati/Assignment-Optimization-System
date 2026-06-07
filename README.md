@@ -3,6 +3,7 @@
 ## 👥 Group Members
 
 | No. | Name | Matric Number |
+|---|---|---|
 | 1 | MUHAMMAD SYABIL ASNA BIN MOHAMAD RASOOL | 2240216 |
 | 2 | NUR AMIRAH MIRZA BINTI IBRAHIM | 2240217 |
 | 3 | KWEE ZHENG YU | 2240218 |
@@ -177,6 +178,7 @@ The `history` table stores:
 1. Install and open XAMPP.
 2. Start Apache and MySQL.
 3. Copy the project folder into:
+   - C:\xampp\htdocs\
 4. Open phpMyAdmin in your browser:
    - http://localhost/phpmyadmin
 5. Create a new database named:
@@ -185,13 +187,13 @@ The `history` table stores:
    - db.sql
 7. Run the system in your browser:
    - http://localhost/lp_system/input.php
+8. The system is ready to use.
 
 ## 📸 System Screenshots
+The repository includes screenshots of the system:
 
-Screenshots of the system are included in the presentation slides.
-
-- Homepage
-- Input Page
-- Result Page
-- History Page
-- Database Table
+- homepage.png
+- input-page.png
+- result-page.png
+- history-page.png
+- database.png
